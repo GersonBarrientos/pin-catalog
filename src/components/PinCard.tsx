@@ -22,10 +22,10 @@ export default function PinCard({ pin }: PinCardProps) {
 
   return (
     <div 
-      className="glass-panel rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-500/20"
+      className="bg-white rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-gray-200 border border-gray-100"
       onClick={() => openModal(pin)}
     >
-      <div className="aspect-[4/3] bg-slate-800 relative overflow-hidden">
+      <div className="aspect-[4/3] bg-gray-50 relative overflow-hidden">
         {pin.image_url ? (
           <img 
             src={pin.image_url} 
@@ -33,7 +33,7 @@ export default function PinCard({ pin }: PinCardProps) {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-600 bg-gradient-to-br from-slate-800 to-slate-900">
+          <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-50 font-medium">
             Sin Imagen
           </div>
         )}
@@ -59,21 +59,21 @@ export default function PinCard({ pin }: PinCardProps) {
       </div>
 
       <div className="p-5">
-        <h3 className="text-xl font-bold text-slate-100 mb-1 group-hover:text-blue-400 transition-colors">
+        <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-rose-500 transition-colors">
           {pin.nombre}
         </h3>
-        <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+        <p className="text-gray-500 text-sm mb-4 line-clamp-2">
           {pin.descripcion || 'Sin descripción'}
         </p>
         
         <div className="flex justify-between items-center mt-auto">
-          <span className="text-2xl font-black text-emerald-400">
+          <span className="text-2xl font-black text-gray-900">
             ${pin.precio}
           </span>
           <div className="flex gap-2">
             <button 
               onClick={(e) => { e.stopPropagation(); openModal(pin); }}
-              className="p-2 bg-slate-700/50 hover:bg-slate-700 rounded-full text-slate-300 transition-colors"
+              className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-600 transition-colors"
               title="Ver detalles"
             >
               <Eye size={18} />
@@ -83,8 +83,8 @@ export default function PinCard({ pin }: PinCardProps) {
               disabled={!isAvailable}
               className={`p-2 rounded-full flex items-center justify-center transition-colors ${
                 isAvailable 
-                  ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/30' 
-                  : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                  ? 'bg-gray-900 hover:bg-gray-800 text-white shadow-md shadow-gray-900/20' 
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
               title={isAvailable ? "Añadir al carrito" : "No disponible"}
             >

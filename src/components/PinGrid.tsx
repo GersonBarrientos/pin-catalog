@@ -53,14 +53,14 @@ export default function PinGrid() {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-400"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
       </div>
     );
   }
 
   if (pins.length === 0) {
     return (
-      <div className="text-center py-20 text-slate-400">
+      <div className="text-center py-20 text-gray-500 font-medium">
         <p>No hay pines disponibles en el catálogo por ahora.</p>
       </div>
     );

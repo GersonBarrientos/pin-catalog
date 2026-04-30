@@ -4,13 +4,13 @@ import PinModal from '@/components/PinModal';
 
 export default function Home() {
   return (
-    <main className="min-h-screen p-8 relative">
-      <header className="mb-12 flex justify-between items-center border-b border-slate-800 pb-6">
+    <main className="min-h-screen bg-[#fafafa] p-4 md:p-8 relative selection:bg-rose-200">
+      <header className="mb-12 flex justify-between items-center border-b border-gray-200 pb-6">
         <div>
-          <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-400 to-emerald-400 text-transparent bg-clip-text">
-            PinCatalog
+          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+            Catálogo de Pines
           </h1>
-          <p className="text-slate-400 mt-2">Colección exclusiva en tiempo real</p>
+          <p className="text-gray-500 mt-2 font-medium">Encuentra tus accesorios favoritos</p>
         </div>
         <CartSidebar />
       </header>
