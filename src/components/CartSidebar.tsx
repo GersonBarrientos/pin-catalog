@@ -51,17 +51,19 @@ export default function CartSidebar() {
       }
 
       // Mensaje enriquecido con el nombre del cliente
-      const itemList = items.map(i => `- ${i.nombre} ($${i.precio})`).join('%0A');
-      const text = `¡Hola! Soy *${clienteNombre}* y quiero confirmar mi pedido:%0A%0A${itemList}%0A%0A*Total: $${total}*%0AMi teléfono es: ${clienteTelefono}%0A%0APor favor envíame los detalles de pago.`;
+      const itemList = items.map(i => `- ${i.nombre} ($${i.precio})`).join('\n');
+      const textRaw = `¡Hola! Soy *${clienteNombre}* y quiero confirmar mi pedido:\n\n${itemList}\n\n*Total: $${total}*\nMi teléfono es: ${clienteTelefono}\n\nPor favor envíame los detalles de pago.`;
       
-      const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+      const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(textRaw)}`;
       
       clearCart();
       setIsOpen(false);
       setClienteNombre('');
       setClienteTelefono('');
       
-      window.open(waUrl, '_blank');
+      // Usamos window.location.href en lugar de window.open para evitar que los 
+      // navegadores móviles bloqueen la ventana emergente tras una llamada asíncrona (await)
+      window.location.href = waUrl;
 
     } catch (err: any) {
       console.error(err);
