@@ -1,8 +1,7 @@
 "use client";
 
 import { useModalStore, useCartStore } from '@/store/useStore';
-import { X, ShoppingBag } from 'lucide-react';
-import { useEffect } from 'react';
+import { X, ShoppingCart, Info, AlertTriangle } from 'lucide-react';
 
 export default function PinModal() {
   const { selectedPin, closeModal } = useModalStore();
