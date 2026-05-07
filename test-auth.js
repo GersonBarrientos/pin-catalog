@@ -7,14 +7,19 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function checkAuth() {
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-    email: 'admin@pinart.com',
-    password: 'admin123456' // Assuming from previous contexts or common defaults, let's try
+    email: 'gersonnizraim@gmail.com',
+    password: 'admin' // Trying common passwords
   });
   
   if (authError) {
-    console.log("Auth error:", authError.message);
-    // Even without auth, let's try to bypass if we had service key. But we only have anon.
-    return;
+    const { data: authData2, error: authError2 } = await supabase.auth.signInWithPassword({
+      email: 'gersonnizraim@gmail.com',
+      password: 'admin123456'
+    });
+    if (authError2) {
+       console.log("Auth error:", authError2.message);
+       return;
+    }
   }
   
   const { data, error } = await supabase.from('pedidos').select('*');

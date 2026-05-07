@@ -25,6 +25,7 @@ export default function AdminDashboardClient({ initialPedidos, initialPins }: { 
   const router = useRouter();
 
   useEffect(() => {
+    // Intentar usar Realtime (requiere que la tabla esté en supabase_realtime)
     const channel = supabase
       .channel('admin-pedidos-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, (payload) => {
@@ -35,7 +36,21 @@ export default function AdminDashboardClient({ initialPedidos, initialPins }: { 
         }
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+
+    // Fallback: Polling cada 10 segundos por si Realtime no está activado
+    const fetchPedidos = async () => {
+      const { data } = await supabase.from('pedidos').select('*').order('created_at', { ascending: false });
+      if (data) {
+        setPedidos(data);
+      }
+    };
+    
+    const intervalId = setInterval(fetchPedidos, 10000); // 10 segundos
+
+    return () => { 
+      supabase.removeChannel(channel); 
+      clearInterval(intervalId);
+    };
   }, [supabase]);
 
   const pedidosPendientes = pedidos.filter(p => p.estado === 'pendiente');
