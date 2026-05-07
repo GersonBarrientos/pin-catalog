@@ -1,13 +1,23 @@
 -- Script para crear el esquema en Supabase
 
--- 1. Tipo Enum para el estado de pines
-CREATE TYPE public.estado_pin AS ENUM ('disponible', 'reservado', 'agotado');
+-- 1. Tipo Enum para el estado de pines (solo si no existe)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'estado_pin') THEN
+    CREATE TYPE public.estado_pin AS ENUM ('disponible', 'reservado', 'agotado');
+  END IF;
+END$$;
 
--- 2. Tipo Enum para el estado de pedidos
-CREATE TYPE public.estado_pedido AS ENUM ('pendiente', 'completado', 'cancelado');
+-- 2. Tipo Enum para el estado de pedidos (solo si no existe)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'estado_pedido') THEN
+    CREATE TYPE public.estado_pedido AS ENUM ('pendiente', 'completado', 'cancelado');
+  END IF;
+END$$;
 
--- 3. Tabla de Inventario
-CREATE TABLE public.inventario (
+-- 3. Tabla de Inventario (idempotente)
+CREATE TABLE IF NOT EXISTS public.inventario (
   uuid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   slug TEXT UNIQUE NOT NULL,
   nombre TEXT NOT NULL,
@@ -20,8 +30,8 @@ CREATE TABLE public.inventario (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. Tabla de Pedidos
-CREATE TABLE public.pedidos (
+-- 4. Tabla de Pedidos (idempotente)
+CREATE TABLE IF NOT EXISTS public.pedidos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   cliente_nombre TEXT NOT NULL,
   cliente_telefono TEXT NOT NULL,
