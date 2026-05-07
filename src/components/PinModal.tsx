@@ -49,7 +49,7 @@ export default function PinModal() {
           )}
         </div>
 
-        <div className="md:w-1/2 p-8 md:p-10 flex flex-col bg-[#fefbf7]">
+        <div className="md:w-1/2 p-5 sm:p-8 md:p-10 flex flex-col bg-[#fefbf7]">
           <div className="mb-6">
             <div className="flex gap-2 mb-4">
               {selectedPin.estado === 'reservado' && (
