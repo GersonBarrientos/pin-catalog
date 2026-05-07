@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { Send, CreditCard, Loader, AlertCircle } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 import { useWompiPayment } from '@/hooks/useWompiPayment';
 
 interface CheckoutFormProps {
   total: number;
-  items: Array<{ nombre: string; cantidad: number; precio: number }>;
+  items: Array<{ uuid?: string; nombre: string; cantidad: number; precio: number; image_url?: string }>;
   onSuccess?: (method: 'whatsapp' | 'wompi') => void;
 }
 
@@ -20,6 +21,7 @@ export default function CheckoutForm({ total, items, onSuccess }: CheckoutFormPr
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { generateWompiPaymentLink, openWompiWindow } = useWompiPayment();
+  const supabase = createClient();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -47,23 +49,65 @@ export default function CheckoutForm({ total, items, onSuccess }: CheckoutFormPr
     return true;
   };
 
-  const handleWhatsAppPayment = () => {
+  // Guardar pedido en BD
+  const savePedidoToDB = async (paymentMethod: 'whatsapp' | 'wompi') => {
+    try {
+      const { data, error: dbError } = await supabase.rpc('crear_pedido', {
+        p_cliente_nombre: formData.nombre,
+        p_cliente_telefono: formData.telefono,
+        p_cliente_email: formData.email,
+        p_items: items, // Se envía todo el array con uuid e image_url
+        p_total: total,
+        p_payment_method: paymentMethod,
+      });
+
+      if (dbError) {
+        console.error('Error al guardar pedido:', dbError);
+        setError('Error al guardar el pedido. Intenta de nuevo.');
+        return null;
+      }
+
+      return data; // Retorna el ID del pedido
+    } catch (err) {
+      console.error('Error:', err);
+      setError('Error al procesar la solicitud.');
+      return null;
+    }
+  };
+
+  const handleWhatsAppPayment = async () => {
     if (!validateForm()) return;
 
-    const message = encodeURIComponent(
-      `Hola PinArt,\n\n` +
-      `Quisiera confirmar mi compra:\n\n` +
-      `👤 Nombre: ${formData.nombre}\n` +
-      `📞 Teléfono: ${formData.telefono}\n` +
-      `📧 Email: ${formData.email}\n\n` +
-      `📦 Productos:\n${items.map(item => `• ${item.cantidad}x ${item.nombre}: $${(item.cantidad * item.precio).toFixed(2)}`).join('\n')}\n\n` +
-      `💰 Total: $${total.toFixed(2)}\n\n` +
-      `Método de pago: WhatsApp\n` +
-      `¡Espero mi confirmación!`
-    );
+    setLoading(true);
+    try {
+      // Guardar pedido primero
+      const pedidoId = await savePedidoToDB('whatsapp');
+      if (!pedidoId) {
+        setLoading(false);
+        return;
+      }
 
-    window.open(`https://wa.me/50370425319?text=${message}`, '_blank');
-    onSuccess?.('whatsapp');
+      const message = encodeURIComponent(
+        `Hola PinArt,\n\n` +
+        `Quisiera confirmar mi compra:\n\n` +
+        `👤 Nombre: ${formData.nombre}\n` +
+        `📞 Teléfono: ${formData.telefono}\n` +
+        `📧 Email: ${formData.email}\n\n` +
+        `📦 Productos:\n${items.map(item => `• ${item.cantidad}x ${item.nombre}: $${(item.cantidad * item.precio).toFixed(2)}`).join('\n')}\n\n` +
+        `💰 Total: $${total.toFixed(2)}\n\n` +
+        `📋 Referencia: ${pedidoId.slice(0, 8).toUpperCase()}\n` +
+        `Método de pago: WhatsApp\n` +
+        `¡Espero mi confirmación!`
+      );
+
+      window.open(`https://wa.me/50370425319?text=${message}`, '_blank');
+      onSuccess?.('whatsapp');
+    } catch (err) {
+      console.error(err);
+      setError('Error al procesar WhatsApp.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleWompiPayment = async () => {
@@ -71,12 +115,16 @@ export default function CheckoutForm({ total, items, onSuccess }: CheckoutFormPr
 
     setLoading(true);
     try {
-      // Generar referencia única
-      const reference = `PINART-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`;
+      // Guardar pedido primero
+      const pedidoId = await savePedidoToDB('wompi');
+      if (!pedidoId) {
+        setLoading(false);
+        return;
+      }
 
       // Generar link de pago
       const paymentLink = await generateWompiPaymentLink({
-        reference,
+        reference: pedidoId,
         clientName: formData.nombre,
         clientEmail: formData.email,
         clientPhone: formData.telefono,

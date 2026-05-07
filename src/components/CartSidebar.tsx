@@ -91,9 +91,11 @@ export default function CartSidebar() {
             <CheckoutForm 
               total={total} 
               items={items.map(item => ({
+                uuid: item.uuid,
                 nombre: item.nombre,
                 cantidad: 1,
-                precio: item.precio
+                precio: item.precio,
+                image_url: item.image_url
               }))}
               onSuccess={handleCheckoutSuccess}
             />
