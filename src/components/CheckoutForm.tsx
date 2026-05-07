@@ -38,14 +38,7 @@ export default function CheckoutForm({ total, items, onSuccess }: CheckoutFormPr
       setError('Por favor ingresa tu teléfono');
       return false;
     }
-    if (!formData.email.trim()) {
-      setError('Por favor ingresa tu email');
-      return false;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError('Por favor ingresa un email válido');
-      return false;
-    }
+    // Email opcional: si se provee, se puede validar en el futuro.
     return true;
   };
 
