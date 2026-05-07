@@ -47,35 +47,78 @@ CREATE TABLE IF NOT EXISTS public.pedidos (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. Habilitar Row Level Security (RLS)
 ALTER TABLE public.inventario ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pedidos ENABLE ROW LEVEL SECURITY;
+-- 6. Políticas RLS para Inventario (idempotente)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policy WHERE polname = 'Lectura pública permitida' AND polrelid = 'public.inventario'::regclass
+  ) THEN
+    CREATE POLICY "Lectura pública permitida" ON public.inventario
+      FOR SELECT USING (true);
+  END IF;
+END$$;
 
--- 6. Políticas RLS para Inventario
--- Permitir lectura a todos (público)
-CREATE POLICY "Lectura pública permitida" ON public.inventario
-  FOR SELECT USING (true);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policy WHERE polname = 'Actualización admin' AND polrelid = 'public.inventario'::regclass
+  ) THEN
+    CREATE POLICY "Actualización admin" ON public.inventario
+      FOR UPDATE USING (auth.role() = 'authenticated');
+  END IF;
+END$$;
 
--- Permitir actualización solo a usuarios autenticados (Admin) o a través de Security Definer (RPC)
-CREATE POLICY "Actualización admin" ON public.inventario
-  FOR UPDATE USING (auth.role() = 'authenticated');
+-- 7. Políticas RLS para Pedidos (idempotente)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policy WHERE polname = 'Admin puede leer pedidos' AND polrelid = 'public.pedidos'::regclass
+  ) THEN
+    CREATE POLICY "Admin puede leer pedidos" ON public.pedidos
+      FOR SELECT USING (auth.role() = 'authenticated');
+  END IF;
+END$$;
 
--- 7. Políticas RLS para Pedidos
--- Permitir lectura solo a admin
-CREATE POLICY "Admin puede leer pedidos" ON public.pedidos
-  FOR SELECT USING (auth.role() = 'authenticated');
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policy WHERE polname = 'Crear pedido' AND polrelid = 'public.pedidos'::regclass
+  ) THEN
+    CREATE POLICY "Crear pedido" ON public.pedidos
+      FOR INSERT WITH CHECK (true);
+  END IF;
+END$$;
 
--- Permitir inserción a través de RPC (anónimo o usuario)
-CREATE POLICY "Crear pedido" ON public.pedidos
-  FOR INSERT WITH CHECK (true);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policy WHERE polname = 'Admin puede actualizar pedidos' AND polrelid = 'public.pedidos'::regclass
+  ) THEN
+    CREATE POLICY "Admin puede actualizar pedidos" ON public.pedidos
+      FOR UPDATE USING (auth.role() = 'authenticated');
+  END IF;
+END$$;
 
--- Permitir actualización solo a admin
-CREATE POLICY "Admin puede actualizar pedidos" ON public.pedidos
-  FOR UPDATE USING (auth.role() = 'authenticated');
+-- 8. Activar Supabase Realtime para las tablas (solo si no están en la publicación)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'inventario'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.inventario;
+  END IF;
+END$$;
 
--- 8. Activar Supabase Realtime para las tablas
-ALTER PUBLICATION supabase_realtime ADD TABLE public.inventario;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.pedidos;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'pedidos'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.pedidos;
+  END IF;
+END$$;
 
 -- 9. Función RPC para crear un pedido (con manejo de stock)
 CREATE OR REPLACE FUNCTION public.crear_pedido(
