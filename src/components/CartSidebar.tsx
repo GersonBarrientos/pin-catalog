@@ -75,7 +75,7 @@ export default function CartSidebar() {
     <>
       <button 
         onClick={toggleCart}
-        className="relative p-3 bg-white hover:bg-teal-50 rounded-full transition-all border border-teal-100 shadow-sm hover:shadow-md hover:scale-105 group"
+        className="relative p-3 bg-white hover:bg-teal-50 rounded-full transition-all border border-teal-100 shadow-sm hover:shadow-md hover:scale-105 group lg:hidden"
       >
         <ShoppingCart className="text-teal-700 group-hover:text-teal-600 transition-colors" size={26} />
         {items.length > 0 && (
@@ -85,21 +85,30 @@ export default function CartSidebar() {
         )}
       </button>
 
+      {/* Mobile backdrop */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-slate-900/40 z-40 backdrop-blur-sm"
+          className="fixed inset-0 bg-slate-900/40 z-40 backdrop-blur-sm lg:hidden"
           onClick={() => setIsOpen(false)}
         ></div>
       )}
 
-      <div className={`fixed top-0 right-0 h-full w-full sm:w-96 bg-white/95 backdrop-blur-xl shadow-2xl z-50 transform transition-transform duration-300 ease-in-out border-l border-teal-100 ${isOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
+      {/* Cart Panel */}
+      <div className={`
+        fixed lg:relative top-0 right-0 h-full w-full sm:w-96 lg:w-full 
+        bg-white/95 lg:bg-white backdrop-blur-xl lg:backdrop-blur-none 
+        shadow-2xl lg:shadow-none z-50 lg:z-auto 
+        transform transition-transform duration-300 ease-in-out 
+        border-l border-teal-100 flex flex-col
+        ${isOpen ? 'translate-x-0 lg:translate-x-0' : 'translate-x-full lg:translate-x-0 lg:hidden'}
+      `}>
         
         <div className="p-6 border-b border-teal-100 flex justify-between items-center bg-teal-50/50">
           <h2 className="text-xl font-bold flex items-center gap-2 text-teal-800">
             <ShoppingCart size={22} className="text-teal-500" />
             Tu Pedido
           </h2>
-          <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-rose-500 transition-colors">
+          <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-rose-500 transition-colors p-2 rounded-full hover:bg-white">
             <X size={24} />
           </button>
         </div>
