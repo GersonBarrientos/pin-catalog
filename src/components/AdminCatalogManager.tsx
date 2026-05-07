@@ -74,7 +74,6 @@ export default function AdminCatalogManager({ initialPins }: { initialPins: PinI
       }
     }
 
-    // Auto-determinar estado por stock
     const statusToSave = editingPin.stock_disponible && editingPin.stock_disponible > 0 
       ? 'disponible' 
       : 'agotado';
@@ -82,11 +81,8 @@ export default function AdminCatalogManager({ initialPins }: { initialPins: PinI
     const dataToSave = { ...editingPin, image_url: finalImageUrl, estado: statusToSave };
 
     if (editingPin.uuid) {
-      // Edit
       await supabase.from('inventario').update(dataToSave).eq('uuid', editingPin.uuid);
     } else {
-      // Insert
-      // Generate slug from name if empty
       if (!dataToSave.slug) {
         dataToSave.slug = dataToSave.nombre?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'pin-' + Date.now();
       }
@@ -99,59 +95,59 @@ export default function AdminCatalogManager({ initialPins }: { initialPins: PinI
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-white flex items-center gap-2">Gestión de Catálogo</h2>
+      <div className="flex justify-between items-center bg-white/50 p-4 rounded-2xl border border-teal-50 shadow-sm">
+        <h2 className="text-2xl font-bold text-teal-800 flex items-center gap-2">Gestión de Catálogo</h2>
         <button 
           onClick={() => handleOpenModal()}
-          className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-500/25"
+          className="bg-teal-500 hover:bg-teal-400 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-md shadow-teal-500/20"
         >
           <Plus size={18} /> Agregar Pin
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {pins.map(pin => (
-          <div key={pin.uuid} className="glass-panel p-4 rounded-xl flex flex-col group relative overflow-hidden">
-            <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-               <button onClick={() => handleOpenModal(pin)} className="p-2 bg-blue-500/90 text-white rounded-lg hover:bg-blue-400 backdrop-blur-sm"><Edit2 size={16} /></button>
-               <button onClick={() => handleDelete(pin.uuid)} className="p-2 bg-rose-500/90 text-white rounded-lg hover:bg-rose-400 backdrop-blur-sm"><Trash2 size={16} /></button>
+          <div key={pin.uuid} className="bg-white p-5 rounded-2xl flex flex-col group relative overflow-hidden border border-teal-50 shadow-sm hover:shadow-xl hover:border-teal-200 transition-all">
+            <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+               <button onClick={() => handleOpenModal(pin)} className="p-2 bg-white text-teal-600 shadow-md rounded-xl hover:bg-teal-50 transition-colors"><Edit2 size={16} /></button>
+               <button onClick={() => handleDelete(pin.uuid)} className="p-2 bg-white text-rose-500 shadow-md rounded-xl hover:bg-rose-50 transition-colors"><Trash2 size={16} /></button>
             </div>
             
-            <div className="w-full h-40 bg-slate-800 rounded-lg overflow-hidden mb-4 relative">
+            <div className="w-full h-48 bg-slate-50 rounded-xl overflow-hidden mb-5 relative">
               {pin.image_url ? (
-                <img src={pin.image_url} alt={pin.nombre} className="w-full h-full object-cover" />
+                <img src={pin.image_url} alt={pin.nombre} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-slate-500 text-sm">Sin imagen</div>
+                <div className="w-full h-full flex items-center justify-center text-slate-400 font-medium bg-slate-100">Sin imagen</div>
               )}
-              <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/60 backdrop-blur-md rounded text-xs font-bold text-white">
+              <div className="absolute bottom-3 left-3 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-lg shadow-sm text-xs font-bold text-teal-700">
                 Stock: {pin.stock_disponible}
               </div>
             </div>
             
-            <h3 className="font-bold text-slate-100 truncate">{pin.nombre}</h3>
-            <p className="text-emerald-400 font-black mt-1">${pin.precio}</p>
+            <h3 className="font-bold text-lg text-slate-800 truncate">{pin.nombre}</h3>
+            <p className="text-teal-600 font-black text-xl mt-1">${pin.precio}</p>
           </div>
         ))}
       </div>
 
       {isModalOpen && editingPin && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="glass-panel w-full max-w-lg bg-slate-900 rounded-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-slate-800 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-white">{editingPin.uuid ? 'Editar Pin' : 'Nuevo Pin'}</h3>
-              <button onClick={handleCloseModal} className="text-slate-400 hover:text-white"><X size={20} /></button>
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl flex flex-col max-h-[90vh] border border-teal-100">
+            <div className="p-6 border-b border-teal-50 flex justify-between items-center bg-teal-50/30 rounded-t-3xl">
+              <h3 className="text-2xl font-bold text-teal-800">{editingPin.uuid ? 'Editar Pin' : 'Nuevo Pin'}</h3>
+              <button onClick={handleCloseModal} className="text-slate-400 hover:text-slate-600 bg-white p-2 rounded-full shadow-sm"><X size={20} /></button>
             </div>
             
-            <form onSubmit={handleSave} className="p-6 overflow-y-auto flex flex-col gap-4">
+            <form onSubmit={handleSave} className="p-6 overflow-y-auto flex flex-col gap-5">
               <div>
-                <label className="text-sm text-slate-400 mb-1 block">Nombre</label>
-                <input required type="text" value={editingPin.nombre || ''} onChange={e => setEditingPin({...editingPin, nombre: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white" />
+                <label className="text-sm font-bold text-slate-600 mb-2 block">Nombre</label>
+                <input required type="text" value={editingPin.nombre || ''} onChange={e => setEditingPin({...editingPin, nombre: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all" />
               </div>
               <div>
-                <label className="text-sm text-slate-400 mb-1 block">Imagen del Producto</label>
+                <label className="text-sm font-bold text-slate-600 mb-2 block">Imagen del Producto</label>
                 {imagePreview && (
-                   <div className="mb-3 w-full h-32 bg-slate-800/50 rounded-lg overflow-hidden border border-slate-700/50 relative">
-                      <img src={imagePreview} alt="Preview" className="w-full h-full object-contain" />
+                   <div className="mb-4 w-full h-40 bg-slate-50 rounded-xl overflow-hidden border border-slate-200 relative flex justify-center">
+                      <img src={imagePreview} alt="Preview" className="h-full object-contain drop-shadow-md" />
                    </div>
                 )}
                 <input 
@@ -164,26 +160,26 @@ export default function AdminCatalogManager({ initialPins }: { initialPins: PinI
                       setImagePreview(URL.createObjectURL(file));
                     }
                   }} 
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-blue-500/20 file:text-blue-400 hover:file:bg-blue-500/30" 
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-teal-100 file:text-teal-700 hover:file:bg-teal-200 transition-all cursor-pointer" 
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-5">
                 <div>
-                  <label className="text-sm text-slate-400 mb-1 block">Precio ($)</label>
-                  <input required type="number" step="0.01" min="0" value={editingPin.precio || 0} onChange={e => setEditingPin({...editingPin, precio: parseFloat(e.target.value)})} className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white" />
+                  <label className="text-sm font-bold text-slate-600 mb-2 block">Precio ($)</label>
+                  <input required type="number" step="0.01" min="0" value={editingPin.precio || 0} onChange={e => setEditingPin({...editingPin, precio: parseFloat(e.target.value)})} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all" />
                 </div>
                 <div>
-                  <label className="text-sm text-slate-400 mb-1 block">Stock Inicial</label>
-                  <input required type="number" min="0" value={editingPin.stock_disponible || 0} onChange={e => setEditingPin({...editingPin, stock_disponible: parseInt(e.target.value)})} className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white" />
+                  <label className="text-sm font-bold text-slate-600 mb-2 block">Stock Inicial</label>
+                  <input required type="number" min="0" value={editingPin.stock_disponible || 0} onChange={e => setEditingPin({...editingPin, stock_disponible: parseInt(e.target.value)})} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all" />
                 </div>
               </div>
               <div>
-                <label className="text-sm text-slate-400 mb-1 block">Descripción</label>
-                <textarea rows={3} value={editingPin.descripcion || ''} onChange={e => setEditingPin({...editingPin, descripcion: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white"></textarea>
+                <label className="text-sm font-bold text-slate-600 mb-2 block">Descripción</label>
+                <textarea rows={3} value={editingPin.descripcion || ''} onChange={e => setEditingPin({...editingPin, descripcion: e.target.value})} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all resize-none"></textarea>
               </div>
               
-              <button disabled={isProcessing} type="submit" className="w-full mt-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3 rounded-xl flex justify-center items-center gap-2">
-                {isProcessing ? 'Guardando...' : <><Save size={18} /> Guardar Pin</>}
+              <button disabled={isProcessing} type="submit" className="w-full mt-4 bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600 text-white font-bold p-4 rounded-xl flex justify-center items-center gap-2 shadow-lg shadow-teal-500/30 transition-all transform hover:scale-[1.02]">
+                {isProcessing ? 'Guardando...' : <><Save size={20} /> Guardar Pin</>}
               </button>
             </form>
           </div>

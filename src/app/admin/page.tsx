@@ -23,7 +23,7 @@ export default async function AdminPage() {
     .order('created_at', { ascending: false });
 
   if (pedidosError || pinesError) {
-    return <div className="p-8 text-rose-400 bg-slate-900 min-h-screen">Error cargando datos. Revisa tu conexión.</div>;
+    return <div className="p-8 text-rose-500 bg-white min-h-screen font-bold">Error cargando datos. Revisa tu conexión.</div>;
   }
 
   return <AdminDashboardClient initialPedidos={pedidos || []} initialPins={pines || []} />

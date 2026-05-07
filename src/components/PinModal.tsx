@@ -8,94 +8,104 @@ export default function PinModal() {
   const { selectedPin, closeModal } = useModalStore();
   const addItem = useCartStore((state) => state.addItem);
 
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeModal();
-    };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [closeModal]);
-
   if (!selectedPin) return null;
 
   const isAvailable = selectedPin.estado === 'disponible' && selectedPin.stock_disponible > 0;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity"
-        onClick={closeModal}
-      ></div>
+  const handleAddToCart = () => {
+    if (isAvailable) {
+      addItem(selectedPin);
+      closeModal();
+    }
+  };
 
-      {/* Modal Content */}
-      <div className="relative bg-white w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row z-10 animate-in fade-in zoom-in duration-300">
+  return (
+    <div 
+      className="fixed inset-0 bg-stone-900/40 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6"
+      onClick={closeModal}
+    >
+      <div 
+        className="bg-[#fefbf7] w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-teal-100 transform transition-all animate-in fade-in zoom-in-95 duration-300 max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button 
           onClick={closeModal}
-          className="absolute top-4 right-4 p-2 bg-white/80 hover:bg-gray-100 rounded-full text-gray-500 hover:text-gray-900 z-20 backdrop-blur-md transition-colors shadow-sm"
+          className="absolute top-4 right-4 z-10 p-2 bg-white/80 hover:bg-white text-stone-500 hover:text-teal-600 rounded-full backdrop-blur-md transition-colors shadow-sm"
         >
           <X size={20} />
         </button>
 
-        {/* Image Area */}
-        <div className="w-full md:w-1/2 h-64 md:h-auto bg-gray-50 relative">
+        <div className="md:w-1/2 bg-stone-100 relative min-h-[300px] md:min-h-full flex items-center justify-center p-8">
           {selectedPin.image_url ? (
             <img 
               src={selectedPin.image_url} 
               alt={selectedPin.nombre} 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain drop-shadow-xl"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400 font-medium">
-              Imagen no disponible
+            <div className="text-stone-400 font-medium flex flex-col items-center gap-3">
+              <Info size={48} className="opacity-50" />
+              <span>Imagen no disponible</span>
             </div>
           )}
         </div>
 
-        {/* Details Area */}
-        <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-white">
-          <div className="mb-2">
-            <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase mb-4 ${
-              selectedPin.estado === 'disponible' ? 'bg-emerald-500/20 text-emerald-400' :
-              selectedPin.estado === 'reservado' ? 'bg-amber-500/20 text-amber-400' :
-              'bg-rose-500/20 text-rose-400'
-            }`}>
-              {selectedPin.estado}
-            </span>
-            <span className="text-slate-500 text-sm ml-3">
-              Stock: {selectedPin.stock_disponible}
-            </span>
+        <div className="md:w-1/2 p-8 md:p-10 flex flex-col bg-[#fefbf7]">
+          <div className="mb-6">
+            <div className="flex gap-2 mb-4">
+              {selectedPin.estado === 'reservado' && (
+                <span className="px-3 py-1 bg-amber-500/10 text-amber-600 border border-amber-200 text-xs font-bold rounded-full flex items-center gap-1">
+                  <AlertTriangle size={12} /> Reservado
+                </span>
+              )}
+              {selectedPin.estado === 'agotado' && (
+                <span className="px-3 py-1 bg-teal-500/10 text-teal-600 border border-teal-200 text-xs font-bold rounded-full flex items-center gap-1">
+                  <X size={12} /> Agotado
+                </span>
+              )}
+              {isAvailable && (
+                <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 border border-emerald-200 text-xs font-bold rounded-full flex items-center gap-1">
+                  <ShoppingCart size={12} /> Disponible
+                </span>
+              )}
+            </div>
+            
+            <h2 className="text-3xl md:text-4xl font-extrabold text-stone-800 mb-2 leading-tight">
+              {selectedPin.nombre}
+            </h2>
+            <p className="text-4xl font-black text-teal-600 my-4">
+              ${selectedPin.precio}
+            </p>
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
-            {selectedPin.nombre}
-          </h2>
-          
-          <p className="text-gray-500 leading-relaxed mb-8">
-            {selectedPin.descripcion || 'Este pin es exclusivo y no tiene descripción en este momento.'}
-          </p>
+          <div className="prose prose-stone prose-sm mb-8 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+            <h4 className="text-sm font-bold text-stone-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+              <Info size={16} /> Acerca de este pin
+            </h4>
+            <p className="text-stone-600 leading-relaxed text-base">
+              {selectedPin.descripcion || 'Este hermoso pin no tiene una descripción detallada todavía, ¡pero te aseguramos que lucirá genial en tu mochila o chaqueta!'}
+            </p>
+          </div>
 
-          <div className="mt-auto flex items-center justify-between">
-            <span className="text-4xl font-black text-gray-900">
-              ${selectedPin.precio}
-            </span>
-            
-            <button
-              onClick={() => {
-                if (isAvailable) {
-                  addItem(selectedPin);
-                  closeModal();
-                }
-              }}
+          <div className="mt-auto pt-6 border-t border-teal-50">
+            <div className="flex justify-between items-center mb-6">
+              <span className="text-stone-500 font-medium">Disponibilidad en tienda:</span>
+              <span className={`font-bold ${isAvailable ? 'text-teal-600' : 'text-stone-400'}`}>
+                {selectedPin.stock_disponible} unidades
+              </span>
+            </div>
+
+            <button 
+              onClick={handleAddToCart}
               disabled={!isAvailable}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${
-                isAvailable
-                  ? 'bg-gray-900 hover:bg-gray-800 text-white shadow-lg shadow-gray-900/20 hover:shadow-gray-900/30 hover:-translate-y-1'
-                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all shadow-lg ${
+                isAvailable 
+                  ? 'bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600 text-white shadow-teal-500/30 hover:scale-[1.02]' 
+                  : 'bg-stone-100 text-stone-400 cursor-not-allowed border border-stone-200 shadow-none'
               }`}
             >
-              <ShoppingBag size={20} />
-              {isAvailable ? 'Añadir al Carrito' : 'No Disponible'}
+              <ShoppingCart size={22} />
+              {isAvailable ? 'Añadir al Carrito' : 'Agotado'}
             </button>
           </div>
         </div>
