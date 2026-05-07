@@ -73,7 +73,7 @@ export default function PinModal() {
               {selectedPin.nombre}
             </h2>
             <p className="text-4xl font-black text-teal-600 my-4">
-              ${selectedPin.precio}
+              ${Number(selectedPin.precio).toFixed(2)}
             </p>
           </div>
 
@@ -103,7 +103,7 @@ export default function PinModal() {
                   : 'bg-stone-100 text-stone-400 cursor-not-allowed border border-stone-200 shadow-none'
               }`}
             >
-              <ShoppingCart size={22} />
+              {isAvailable && <ShoppingCart size={22} />}
               {isAvailable ? 'Añadir al Carrito' : 'Agotado'}
             </button>
           </div>

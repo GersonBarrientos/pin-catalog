@@ -117,13 +117,13 @@ export default function CartSidebar() {
                 <div className="w-16 h-16 rounded-xl bg-slate-50 flex-shrink-0 overflow-hidden border border-slate-100">
                   {item.image_url && <img src={item.image_url} alt={item.nombre} className="w-full h-full object-cover" />}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 flex flex-col justify-center">
                   <h4 className="font-bold text-sm line-clamp-1 text-slate-800">{item.nombre}</h4>
-                  <p className="text-teal-600 font-black mt-1">${item.precio}</p>
+                  <p className="text-teal-600 font-black mt-1">${Number(item.precio).toFixed(2)}</p>
                 </div>
                 <button 
                   onClick={() => removeItem(item.uuid)}
-                  className="text-slate-300 hover:text-rose-500 p-2 hover:bg-rose-50 rounded-xl transition-all h-fit"
+                  className="text-slate-300 hover:text-rose-500 p-2 hover:bg-rose-50 rounded-xl transition-all self-center"
                 >
                   <Trash2 size={18} />
                 </button>
@@ -132,35 +132,41 @@ export default function CartSidebar() {
           )}
         </div>
 
-        <div className="p-6 border-t border-teal-100 bg-teal-50/50">
+        <div className="p-6 border-t border-teal-100 bg-teal-50/50 flex flex-col shrink-0">
           {error && (
-            <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-600 text-sm font-medium">
+            <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-600 text-sm font-bold shadow-sm">
               {error}
             </div>
           )}
           
           {items.length > 0 && (
-            <div className="mb-6 flex flex-col gap-3">
-              <input 
-                type="text" 
-                placeholder="Tu Nombre" 
-                value={clienteNombre}
-                onChange={(e) => setClienteNombre(e.target.value)}
-                className="w-full bg-white border border-teal-100 rounded-xl p-3.5 text-slate-800 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 focus:outline-none text-sm transition-all shadow-sm placeholder:text-slate-400"
-              />
-              <input 
-                type="tel" 
-                placeholder="Tu Teléfono" 
-                value={clienteTelefono}
-                onChange={(e) => setClienteTelefono(e.target.value)}
-                className="w-full bg-white border border-teal-100 rounded-xl p-3.5 text-slate-800 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 focus:outline-none text-sm transition-all shadow-sm placeholder:text-slate-400"
-              />
+            <div className="mb-5 flex flex-col gap-4">
+              <div>
+                <label className="text-xs font-bold text-teal-800 uppercase tracking-wider mb-1.5 block">Tu Nombre</label>
+                <input 
+                  type="text" 
+                  placeholder="Ej. Juan Pérez" 
+                  value={clienteNombre}
+                  onChange={(e) => setClienteNombre(e.target.value)}
+                  className="w-full bg-white border border-teal-200 rounded-xl p-3 text-slate-800 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none text-sm transition-all shadow-sm placeholder:text-slate-400"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-teal-800 uppercase tracking-wider mb-1.5 block">Tu Teléfono</label>
+                <input 
+                  type="tel" 
+                  placeholder="Ej. 70425319" 
+                  value={clienteTelefono}
+                  onChange={(e) => setClienteTelefono(e.target.value)}
+                  className="w-full bg-white border border-teal-200 rounded-xl p-3 text-slate-800 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none text-sm transition-all shadow-sm placeholder:text-slate-400"
+                />
+              </div>
             </div>
           )}
 
-          <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-xl border border-teal-100 shadow-sm">
-            <span className="text-slate-500 font-bold">Total a pagar:</span>
-            <span className="text-2xl font-black text-teal-700">${total}</span>
+          <div className="flex justify-between items-center mb-5 bg-white p-4 rounded-xl border border-teal-100 shadow-sm">
+            <span className="text-slate-600 font-bold uppercase text-sm tracking-wider">Total a pagar</span>
+            <span className="text-2xl font-black text-teal-700">${total.toFixed(2)}</span>
           </div>
 
           <button

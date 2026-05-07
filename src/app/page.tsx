@@ -15,7 +15,9 @@ export default function Home() {
             <p className="text-teal-700/70 mt-2 font-bold">Encuentra tus accesorios favoritos</p>
           </div>
         </div>
-        <CartSidebar />
+        <div>
+          <CartSidebar />
+        </div>
       </header>
 
       <div className="max-w-7xl mx-auto relative z-10">

@@ -68,7 +68,7 @@ export default function PinCard({ pin }: PinCardProps) {
         
         <div className="flex justify-between items-center mt-auto">
           <span className="text-2xl font-black text-teal-800 drop-shadow-sm">
-            ${pin.precio}
+            ${Number(pin.precio).toFixed(2)}
           </span>
           <div className="flex gap-2">
             <button 
@@ -78,18 +78,15 @@ export default function PinCard({ pin }: PinCardProps) {
             >
               <Eye size={18} />
             </button>
-            <button 
-              onClick={handleAddToCart}
-              disabled={!isAvailable}
-              className={`p-2 rounded-full flex items-center justify-center transition-all ${
-                isAvailable 
-                  ? 'bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600 text-white shadow-md shadow-teal-500/30 hover:scale-110' 
-                  : 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
-              }`}
-              title={isAvailable ? "Añadir al carrito" : "No disponible"}
-            >
-              <ShoppingCart size={18} />
-            </button>
+            {isAvailable && (
+              <button 
+                onClick={handleAddToCart}
+                className="p-2 rounded-full flex items-center justify-center transition-all bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600 text-white shadow-md shadow-teal-500/30 hover:scale-110"
+                title="Añadir al carrito"
+              >
+                <ShoppingCart size={18} />
+              </button>
+            )}
           </div>
         </div>
       </div>
