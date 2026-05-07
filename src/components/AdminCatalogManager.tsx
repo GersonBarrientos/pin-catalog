@@ -50,6 +50,7 @@ export default function AdminCatalogManager({ initialPins }: { initialPins: PinI
 
   const handleDelete = async (uuid: string) => {
     if (!confirm('¿Estás seguro de que deseas eliminar este pin del catálogo?')) return;
+    setPins(current => current.filter(p => p.uuid !== uuid));
     await supabase.from('inventario').delete().eq('uuid', uuid);
   };
 
@@ -78,14 +79,20 @@ export default function AdminCatalogManager({ initialPins }: { initialPins: PinI
       ? 'disponible' 
       : 'agotado';
       
-    const dataToSave = { ...editingPin, image_url: finalImageUrl, estado: statusToSave };
+    const dataToSave = { ...editingPin, image_url: finalImageUrl, estado: statusToSave } as PinItem;
 
     if (editingPin.uuid) {
+      setPins(current => current.map(p => p.uuid === editingPin.uuid ? { ...p, ...dataToSave } : p));
       await supabase.from('inventario').update(dataToSave).eq('uuid', editingPin.uuid);
     } else {
       if (!dataToSave.slug) {
         dataToSave.slug = dataToSave.nombre?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'pin-' + Date.now();
       }
+      // Temporary UUID until reload
+      const tempUuid = crypto.randomUUID();
+      const newPin = { ...dataToSave, uuid: tempUuid } as PinItem;
+      setPins(current => [newPin, ...current]);
+      
       await supabase.from('inventario').insert(dataToSave);
     }
     

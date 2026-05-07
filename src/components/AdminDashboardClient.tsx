@@ -42,6 +42,9 @@ export default function AdminDashboardClient({ initialPedidos, initialPins }: { 
   const pedidosCompletados = pedidos.filter(p => p.estado === 'completado');
 
   const handleUpdate = async (pedidoId: string, newStatus: 'completado' | 'cancelado', items?: Pedido['items']) => {
+    // Actualizar estado local inmediatamente para UX fluida
+    setPedidos(current => current.map(p => p.id === pedidoId ? { ...p, estado: newStatus } : p));
+
     await supabase.from('pedidos').update({ estado: newStatus }).eq('id', pedidoId);
       
     if (newStatus === 'cancelado' && items) {
