@@ -11,7 +11,7 @@ interface Pedido {
   cliente_telefono: string;
   items: { uuid: string; nombre: string; precio: number; cantidad: number }[];
   total: number;
-  estado: 'pendiente' | 'completado' | 'cancelado';
+  estado: 'pendiente' | 'completado' | 'cancelado' | 'nuevo' | 'entregado';
   created_at: string;
 }
 
@@ -54,8 +54,8 @@ export default function AdminDashboardClient({ initialPedidos, initialPins }: { 
     };
   }, [supabase]);
 
-  const pedidosPendientes = pedidos.filter(p => p.estado === 'pendiente');
-  const pedidosCompletados = pedidos.filter(p => p.estado === 'completado');
+  const pedidosPendientes = pedidos.filter(p => p.estado === 'pendiente' || p.estado === 'nuevo');
+  const pedidosCompletados = pedidos.filter(p => p.estado === 'completado' || p.estado === 'entregado');
 
   const handleUpdate = async (pedidoId: string, newStatus: 'completado' | 'cancelado', items?: Pedido['items']) => {
     // Actualizar estado local inmediatamente para UX fluida
