@@ -41,36 +41,64 @@ export default function AdminDashboardClient({ initialPedidos, initialPins }: Ad
 
   // Realtime - Pedidos
   useEffect(() => {
-    const channel = supabase
-      .channel('dashboard-pedidos')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, (payload) => {
-        if (payload.eventType === 'UPDATE') {
-          setPedidos(current => current.map(p => p.id === payload.new.id ? payload.new : p));
-        } else if (payload.eventType === 'INSERT') {
-          setPedidos(current => [payload.new, ...current]);
-        }
-      })
-      .subscribe();
+    let isSubscribed = true;
 
-    return () => supabase.removeChannel(channel);
+    const setupSubscription = async () => {
+      const channel = supabase
+        .channel('dashboard-pedidos')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, (payload) => {
+          if (isSubscribed) {
+            if (payload.eventType === 'UPDATE') {
+              setPedidos(current => current.map(p => p.id === payload.new.id ? payload.new : p));
+            } else if (payload.eventType === 'INSERT') {
+              setPedidos(current => [payload.new, ...current]);
+            }
+          }
+        })
+        .subscribe();
+
+      return channel;
+    };
+
+    let channel: any;
+    setupSubscription().then(ch => { channel = ch; });
+
+    return () => {
+      isSubscribed = false;
+      if (channel) supabase.removeChannel(channel);
+    };
   }, [supabase]);
 
   // Realtime - Inventario
   useEffect(() => {
-    const channel = supabase
-      .channel('dashboard-inventario')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'inventario' }, (payload) => {
-        if (payload.eventType === 'UPDATE') {
-          setPins(current => current.map(p => p.uuid === payload.new.uuid ? payload.new : p));
-        } else if (payload.eventType === 'INSERT') {
-          setPins(current => [payload.new, ...current]);
-        } else if (payload.eventType === 'DELETE') {
-          setPins(current => current.filter(p => p.uuid !== payload.old.uuid));
-        }
-      })
-      .subscribe();
+    let isSubscribed = true;
 
-    return () => supabase.removeChannel(channel);
+    const setupSubscription = async () => {
+      const channel = supabase
+        .channel('dashboard-inventario')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'inventario' }, (payload) => {
+          if (isSubscribed) {
+            if (payload.eventType === 'UPDATE') {
+              setPins(current => current.map(p => p.uuid === payload.new.uuid ? (payload.new as PinItem) : p));
+            } else if (payload.eventType === 'INSERT') {
+              setPins(current => [(payload.new as PinItem), ...current]);
+            } else if (payload.eventType === 'DELETE') {
+              setPins(current => current.filter(p => p.uuid !== payload.old.uuid));
+            }
+          }
+        })
+        .subscribe();
+
+      return channel;
+    };
+
+    let channel: any;
+    setupSubscription().then(ch => { channel = ch; });
+
+    return () => {
+      isSubscribed = false;
+      if (channel) supabase.removeChannel(channel);
+    };
   }, [supabase]);
 
   const handleSignOut = async () => {

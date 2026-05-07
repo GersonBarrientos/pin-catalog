@@ -15,19 +15,34 @@ export default function AdminCatalogManager({ initialPins }: { initialPins: PinI
   const supabase = createClient();
 
   useEffect(() => {
-    const channel = supabase
-      .channel('admin-inventario-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'inventario' }, (payload) => {
-        if (payload.eventType === 'UPDATE') {
-          setPins(current => current.map(p => p.uuid === payload.new.uuid ? payload.new as PinItem : p));
-        } else if (payload.eventType === 'INSERT') {
-          setPins(current => [payload.new as PinItem, ...current]);
-        } else if (payload.eventType === 'DELETE') {
-          setPins(current => current.filter(p => p.uuid !== payload.old.uuid));
-        }
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    let isSubscribed = true;
+
+    const setupSubscription = async () => {
+      const channel = supabase
+        .channel('admin-inventario-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'inventario' }, (payload) => {
+          if (isSubscribed) {
+            if (payload.eventType === 'UPDATE') {
+              setPins(current => current.map(p => p.uuid === payload.new.uuid ? payload.new as PinItem : p));
+            } else if (payload.eventType === 'INSERT') {
+              setPins(current => [payload.new as PinItem, ...current]);
+            } else if (payload.eventType === 'DELETE') {
+              setPins(current => current.filter(p => p.uuid !== payload.old.uuid));
+            }
+          }
+        })
+        .subscribe();
+
+      return channel;
+    };
+
+    let channel: any;
+    setupSubscription().then(ch => { channel = ch; });
+
+    return () => {
+      isSubscribed = false;
+      if (channel) supabase.removeChannel(channel);
+    };
   }, [supabase]);
 
   const handleOpenModal = (pin?: PinItem) => {

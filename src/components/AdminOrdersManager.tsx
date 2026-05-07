@@ -46,24 +46,36 @@ export default function AdminOrdersManager({ initialPedidos, pins }: AdminOrders
 
   // Realtime subscription
   useEffect(() => {
-    const channel = supabase
-      .channel('admin-pedidos-orders')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, (payload) => {
-        if (payload.eventType === 'UPDATE') {
-          setPedidos(current =>
-            current.map(p =>
-              p.id === payload.new.id ? { ...payload.new as PedidoDetailed, items: enrichItems(payload.new.items) } : p
-            )
-          );
-        } else if (payload.eventType === 'INSERT') {
-          const newPedido = { ...payload.new as PedidoDetailed, items: enrichItems(payload.new.items) };
-          setPedidos(current => [newPedido, ...current]);
-        }
-      })
-      .subscribe();
+    let isSubscribed = true;
+
+    const setupSubscription = async () => {
+      const channel = supabase
+        .channel('admin-pedidos-orders')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, (payload) => {
+          if (isSubscribed) {
+            if (payload.eventType === 'UPDATE') {
+              setPedidos(current =>
+                current.map(p =>
+                  p.id === payload.new.id ? { ...payload.new as PedidoDetailed, items: enrichItems(payload.new.items) } : p
+                )
+              );
+            } else if (payload.eventType === 'INSERT') {
+              const newPedido = { ...payload.new as PedidoDetailed, items: enrichItems(payload.new.items) };
+              setPedidos(current => [newPedido, ...current]);
+            }
+          }
+        })
+        .subscribe();
+
+      return channel;
+    };
+
+    let channel: any;
+    setupSubscription().then(ch => { channel = ch; });
 
     return () => {
-      supabase.removeChannel(channel);
+      isSubscribed = false;
+      if (channel) supabase.removeChannel(channel);
     };
   }, [supabase]);
 
