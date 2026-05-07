@@ -8,6 +8,7 @@ import PinCard from './PinCard';
 export default function PinGrid() {
   const [pins, setPins] = useState<PinItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -17,7 +18,10 @@ export default function PinGrid() {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (!error && data) {
+      if (error) {
+        console.error('Supabase error fetching inventario:', error);
+        setError('No se pudo conectar a la base de datos. Revisa las variables de entorno y la conexión a Supabase.');
+      } else if (data) {
         setPins(data as PinItem[]);
       }
       setLoading(false);
@@ -61,7 +65,15 @@ export default function PinGrid() {
   if (pins.length === 0) {
     return (
       <div className="text-center py-20 text-gray-500 font-medium">
-        <p>No hay pines disponibles en el catálogo por ahora.</p>
+        {error ? (
+          <div className="space-y-2">
+            <p className="text-rose-600 font-bold">Error cargando catálogo</p>
+            <p className="text-sm">{error}</p>
+            <p className="text-sm">Sugerencia: añade `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` en `.env.local` y reinicia el servidor.</p>
+          </div>
+        ) : (
+          <p>No hay pines disponibles en el catálogo por ahora.</p>
+        )}
       </div>
     );
   }
