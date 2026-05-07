@@ -37,7 +37,7 @@ export default function AdminDashboardClient({ initialPedidos, initialPins }: { 
       })
       .subscribe();
 
-    // Fallback: Polling cada 10 segundos por si Realtime no está activado
+    // Fallback: Fetch inmediato al cargar y luego Polling cada 10 segundos
     const fetchPedidos = async () => {
       const { data } = await supabase.from('pedidos').select('*').order('created_at', { ascending: false });
       if (data) {
@@ -45,6 +45,7 @@ export default function AdminDashboardClient({ initialPedidos, initialPins }: { 
       }
     };
     
+    fetchPedidos(); // Llama inmediatamente para machacar el caché del servidor
     const intervalId = setInterval(fetchPedidos, 10000); // 10 segundos
 
     return () => { 
@@ -99,18 +100,31 @@ export default function AdminDashboardClient({ initialPedidos, initialPins }: { 
         </button>
       </header>
 
-      <nav className="flex gap-4 mb-8">
+      <nav className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+        <div className="flex gap-4">
+          <button 
+            onClick={() => setActiveTab('pedidos')} 
+            className={`px-6 py-3 rounded-2xl font-bold transition-all ${activeTab === 'pedidos' ? 'bg-gradient-to-r from-teal-400 to-cyan-500 text-white shadow-lg shadow-teal-500/30' : 'bg-white/60 text-slate-500 hover:bg-white hover:text-teal-600 shadow-sm'}`}
+          >
+            Órdenes y Pedidos
+          </button>
+          <button 
+            onClick={() => setActiveTab('catalogo')} 
+            className={`px-6 py-3 rounded-2xl font-bold transition-all ${activeTab === 'catalogo' ? 'bg-gradient-to-r from-teal-400 to-cyan-500 text-white shadow-lg shadow-teal-500/30' : 'bg-white/60 text-slate-500 hover:bg-white hover:text-teal-600 shadow-sm'}`}
+          >
+            Catálogo de Pines
+          </button>
+        </div>
         <button 
-          onClick={() => setActiveTab('pedidos')} 
-          className={`px-6 py-3 rounded-2xl font-bold transition-all ${activeTab === 'pedidos' ? 'bg-gradient-to-r from-teal-400 to-cyan-500 text-white shadow-lg shadow-teal-500/30' : 'bg-white/60 text-slate-500 hover:bg-white hover:text-teal-600 shadow-sm'}`}
+          onClick={async () => {
+            const { data } = await supabase.from('pedidos').select('*').order('created_at', { ascending: false });
+            if (data) setPedidos(data);
+            alert("Sistema sincronizado con éxito.");
+          }}
+          className="flex items-center gap-2 px-4 py-2 bg-white text-teal-600 border border-teal-100 shadow-sm hover:bg-teal-50 rounded-xl font-bold transition-all"
         >
-          Órdenes y Pedidos
-        </button>
-        <button 
-          onClick={() => setActiveTab('catalogo')} 
-          className={`px-6 py-3 rounded-2xl font-bold transition-all ${activeTab === 'catalogo' ? 'bg-gradient-to-r from-teal-400 to-cyan-500 text-white shadow-lg shadow-teal-500/30' : 'bg-white/60 text-slate-500 hover:bg-white hover:text-teal-600 shadow-sm'}`}
-        >
-          Catálogo de Pines
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Sincronizar Manualmente
         </button>
       </nav>
 
