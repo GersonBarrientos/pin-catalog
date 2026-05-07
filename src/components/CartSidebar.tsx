@@ -61,7 +61,7 @@ export default function CartSidebar() {
       setClienteNombre('');
       setClienteTelefono('');
       
-      window.location.href = waUrl;
+      window.open(waUrl, '_blank');
 
     } catch (err: any) {
       console.error(err);
