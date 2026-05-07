@@ -103,45 +103,45 @@ export default function CartSidebar() {
         ${isOpen ? 'translate-x-0 lg:translate-x-0' : 'translate-x-full lg:translate-x-0 lg:hidden'}
       `}>
         
-        <div className="p-6 border-b border-teal-100 flex justify-between items-center bg-teal-50/50">
-          <h2 className="text-xl font-bold flex items-center gap-2 text-teal-800">
-            <ShoppingCart size={22} className="text-teal-500" />
+        <div className="p-4 lg:p-6 border-b border-teal-100 flex justify-between items-center bg-teal-50/50 shrink-0">
+          <h2 className="text-lg lg:text-xl font-bold flex items-center gap-2 text-teal-800">
+            <ShoppingCart size={20} className="text-teal-500 lg:w-[22px] lg:h-[22px]" />
             Tu Pedido
           </h2>
-          <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-rose-500 transition-colors p-2 rounded-full hover:bg-white">
-            <X size={24} />
+          <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-rose-500 transition-colors p-1.5 lg:p-2 rounded-full hover:bg-white">
+            <X size={22} className="lg:w-[24px] lg:h-[24px]" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
+        <div className="flex-1 overflow-y-auto p-4 lg:p-6 flex flex-col gap-3 lg:gap-4 custom-scrollbar">
           {items.length === 0 ? (
             <div className="text-center text-slate-400 my-auto">
-              <ShoppingCart size={56} className="mx-auto mb-4 opacity-30 text-teal-200" />
-              <p className="font-medium">Tu carrito está vacío</p>
-              <p className="text-sm mt-2 opacity-70">¡Agrega algunos pines hermosos!</p>
+              <ShoppingCart size={48} className="mx-auto mb-3 lg:mb-4 opacity-30 text-teal-200 lg:w-[56px] lg:h-[56px]" />
+              <p className="font-medium text-sm lg:text-base">Tu carrito está vacío</p>
+              <p className="text-xs lg:text-sm mt-1 lg:mt-2 opacity-70">¡Agrega algunos pines hermosos!</p>
             </div>
           ) : (
             items.map((item) => (
-              <div key={item.uuid} className="flex gap-4 p-4 rounded-2xl bg-white border border-teal-50 shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-16 h-16 rounded-xl bg-slate-50 flex-shrink-0 overflow-hidden border border-slate-100">
+              <div key={item.uuid} className="flex gap-3 lg:gap-4 p-3 lg:p-4 rounded-2xl bg-white border border-teal-50 shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-14 h-14 lg:w-16 lg:h-16 rounded-xl bg-slate-50 flex-shrink-0 overflow-hidden border border-slate-100">
                   {item.image_url && <img src={item.image_url} alt={item.nombre} className="w-full h-full object-cover" />}
                 </div>
-                <div className="flex-1 flex flex-col justify-center">
-                  <h4 className="font-bold text-sm line-clamp-1 text-slate-800">{item.nombre}</h4>
-                  <p className="text-teal-600 font-black mt-1">${Number(item.precio).toFixed(2)}</p>
+                <div className="flex-1 flex flex-col justify-center min-w-0">
+                  <h4 className="font-bold text-xs lg:text-sm truncate text-slate-800">{item.nombre}</h4>
+                  <p className="text-teal-600 font-black mt-0.5 lg:mt-1 text-sm lg:text-base">${Number(item.precio).toFixed(2)}</p>
                 </div>
                 <button 
                   onClick={() => removeItem(item.uuid)}
-                  className="text-slate-300 hover:text-rose-500 p-2 hover:bg-rose-50 rounded-xl transition-all self-center"
+                  className="text-slate-300 hover:text-rose-500 p-1.5 lg:p-2 hover:bg-rose-50 rounded-xl transition-all self-center shrink-0"
                 >
-                  <Trash2 size={18} />
+                  <Trash2 size={16} className="lg:w-[18px] lg:h-[18px]" />
                 </button>
               </div>
             ))
           )}
         </div>
 
-        <div className="p-6 border-t border-teal-100 bg-teal-50/50 flex flex-col shrink-0">
+        <div className="p-4 lg:p-6 pb-6 lg:pb-6 border-t border-teal-100 bg-teal-50/50 flex flex-col shrink-0">
           {error && (
             <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-600 text-sm font-bold shadow-sm">
               {error}

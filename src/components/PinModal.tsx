@@ -34,12 +34,12 @@ export default function PinModal() {
           <X size={20} />
         </button>
 
-        <div className="md:w-1/2 bg-stone-100 relative min-h-[300px] md:min-h-full flex items-center justify-center p-8">
+        <div className="md:w-1/2 bg-stone-100 relative min-h-[200px] sm:min-h-[300px] md:min-h-full flex items-center justify-center p-4 sm:p-8 shrink-0">
           {selectedPin.image_url ? (
             <img 
               src={selectedPin.image_url} 
               alt={selectedPin.nombre} 
-              className="w-full h-full object-contain drop-shadow-xl"
+              className="w-full h-full max-h-[200px] md:max-h-none object-contain drop-shadow-xl"
             />
           ) : (
             <div className="text-stone-400 font-medium flex flex-col items-center gap-3">
@@ -49,30 +49,30 @@ export default function PinModal() {
           )}
         </div>
 
-        <div className="md:w-1/2 p-5 sm:p-8 md:p-10 flex flex-col bg-[#fefbf7]">
-          <div className="mb-6">
-            <div className="flex gap-2 mb-4">
+        <div className="md:w-1/2 p-5 sm:p-8 md:p-10 flex flex-col bg-[#fefbf7] flex-1 min-h-0">
+          <div className="mb-4 md:mb-6 shrink-0">
+            <div className="flex gap-2 mb-3 md:mb-4 flex-wrap">
               {selectedPin.estado === 'reservado' && (
-                <span className="px-3 py-1 bg-amber-500/10 text-amber-600 border border-amber-200 text-xs font-bold rounded-full flex items-center gap-1">
+                <span className="px-3 py-1 bg-amber-500/10 text-amber-600 border border-amber-200 text-[10px] md:text-xs font-bold rounded-full flex items-center gap-1">
                   <AlertTriangle size={12} /> Reservado
                 </span>
               )}
               {selectedPin.estado === 'agotado' && (
-                <span className="px-3 py-1 bg-teal-500/10 text-teal-600 border border-teal-200 text-xs font-bold rounded-full flex items-center gap-1">
+                <span className="px-3 py-1 bg-teal-500/10 text-teal-600 border border-teal-200 text-[10px] md:text-xs font-bold rounded-full flex items-center gap-1">
                   <X size={12} /> Agotado
                 </span>
               )}
               {isAvailable && (
-                <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 border border-emerald-200 text-xs font-bold rounded-full flex items-center gap-1">
+                <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 border border-emerald-200 text-[10px] md:text-xs font-bold rounded-full flex items-center gap-1">
                   <ShoppingCart size={12} /> Disponible
                 </span>
               )}
             </div>
             
-            <h2 className="text-3xl md:text-4xl font-extrabold text-stone-800 mb-2 leading-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-stone-800 mb-2 leading-tight">
               {selectedPin.nombre}
             </h2>
-            <p className="text-4xl font-black text-teal-600 my-4">
+            <p className="text-2xl sm:text-3xl md:text-4xl font-black text-teal-600 my-2 md:my-4">
               ${Number(selectedPin.precio).toFixed(2)}
             </p>
           </div>

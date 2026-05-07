@@ -12,8 +12,8 @@ export default function Home() {
     <div className="flex h-screen overflow-hidden bg-slate-50 selection:bg-teal-500/30 selection:text-teal-900">
       {/* Main Catalog Area - Transitions its width based on Cart state */}
       <main className={`transition-all duration-300 ease-in-out flex flex-col relative ${isOpen ? 'w-full lg:w-[60%]' : 'w-full'}`}>
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8">
-      <header className="mb-8 flex flex-row justify-between items-center glass-panel rounded-2xl md:rounded-3xl p-4 md:p-6 mx-auto max-w-7xl gap-3 relative z-20">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-2 sm:p-4 md:p-8">
+      <header className="mb-6 md:mb-8 flex flex-row justify-between items-center glass-panel rounded-2xl md:rounded-3xl p-3 sm:p-4 md:p-6 mx-auto max-w-7xl gap-2 md:gap-3 relative z-20">
         <div className="flex items-center gap-3 min-w-0">
           <img src="/logo.png" alt="PinArt Logo" className="h-12 w-12 md:h-16 md:w-16 object-contain rounded-full bg-white shadow-sm shrink-0" />
           <div className="min-w-0">
